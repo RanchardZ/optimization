@@ -1,8 +1,3 @@
-#from benchmark_funcs.cec_13_real_parameter import *
-#from benchmark_funcs.cec_05_real_parameter import *
-#from benchmark_funcs.karaboga import *
-#from benchmark_funcs.cec_13_lsop import *
-#from common import ROOT_PATH
 from common import *
 
 karaboga_benchmarks 				= ['Rosenbrock', 'Rastrigin', 'Sphere', 'Griewank', 'Ackley']
@@ -30,11 +25,11 @@ cec_13_real_parameter_max_evals 	= 5E5
 cec_13_real_parameter_observe_points = range(100000, 600000, 100000)
 
 cec_14_real_parameter_benchmarks 	= ['CEC14RP_F01', 'CEC14RP_F02', 'CEC14RP_F03', 'CEC14RP_F04', 'CEC14RP_F05',\
-					    'CEC14RP_F06', 'CEC14RP_F07', 'CEC14RP_F08', 'CEC14RP_F09', 'CEC14RP_F10',\
-					    'CEC14RP_F11', 'CEC14RP_F12', 'CEC14RP_F13', 'CEC14RP_F14', 'CEC14RP_F15',\
-					    'CEC14RP_F16', 'CEC14RP_F17', 'CEC14RP_F18', 'CEC14RP_F19', 'CEC14RP_F20',\
-					    'CEC14RP_F21', 'CEC14RP_F22', 'CEC14RP_F23', 'CEC14RP_F24', 'CEC14RP_F25',\
-					    'CEC14RP_F26', 'CEC14RP_F27', 'CEC14RP_F28', 'CEC14RP_F29', 'CEC14RP_F30']
+									   'CEC14RP_F06', 'CEC14RP_F07', 'CEC14RP_F08', 'CEC14RP_F09', 'CEC14RP_F10',\
+									   'CEC14RP_F11', 'CEC14RP_F12', 'CEC14RP_F13', 'CEC14RP_F14', 'CEC14RP_F15',\
+									   'CEC14RP_F16', 'CEC14RP_F17', 'CEC14RP_F18', 'CEC14RP_F19', 'CEC14RP_F20',\
+									   'CEC14RP_F21', 'CEC14RP_F22', 'CEC14RP_F23', 'CEC14RP_F24', 'CEC14RP_F25',\
+									   'CEC14RP_F26', 'CEC14RP_F27', 'CEC14RP_F28', 'CEC14RP_F29', 'CEC14RP_F30']
 cec_14_real_parameter_dim_nums  	= (np.ones(30) * 30).astype('int').tolist()
 cec_14_real_parameter_max_evals 	= 3E5
 cec_14_real_parameter_observe_points = range(10000, 310000, 10000)
@@ -68,7 +63,6 @@ class Suite(object):
 
 def algorithm_test(package, algorithm, pop_nums, suite, epoch_num, archive_switch):
 	exec('from %s import %s' % (package, algorithm))
-	#exec('ts = Suite(benchmarks = %s_benchmarks, pop_nums = pop_nums, dim_nums = %s_dim_nums)' % (suite, suite))
 	ts 				= Suite(suite = suite, pop_nums = pop_nums)
 	project_name 	= 'suite_test'
 	experiment_name = suite
@@ -81,36 +75,24 @@ def algorithm_test(package, algorithm, pop_nums, suite, epoch_num, archive_switc
 		done_count = 0
 		undone_count = 0
 		for epoch in range(1, epoch_num + 1):
-			#if os.path.exists(os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, '_'.join(['OBDE']), str(pop_num), str(dim_num), target, str(int(max_evl)), str(epoch)]) + '.sto')):
-			#if os.path.exists(os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, 'local', '_'.join(['jDE', 'OBDE', 'CoDE']), str(pop_num), str(dim_num), target, str(int(max_evl)), str(epoch)]) + '.sto')):
-			stat_file = os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData',\
+			stat_file = os.path.join(DATA_PATH, project_name, experiment_name, 'rawData',\
 								 '_'.join([algorithm, str(int(pop_num)), str(dim_num), target, str(int(max_evl)), str(epoch)])) + '.sto'
-			#stat_file = os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, 'local', '_'.join(['jDE', 'OBDE', 'CoDE']), str(pop_num), str(dim_num), target, str(int(max_evl)), str(epoch)]) + '.sto')
-			#stat_file = os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, '_'.join(['OBDE']), str(pop_num), str(dim_num), target, str(int(max_evl)), str(epoch)]) + '.sto')
-			#stat_file = os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, '_'.join(['jDE', 'OBDE', 'CoDE']), str(pop_num), str(dim_num), target, str(int(max_evl)), str(epoch)]) + '.sto')
-			#print stat_file
 			if os.path.exists(stat_file):
 				done_count += 1
 				continue
 			else:
 				undone_count += 1
-				#print target
-				
 				exec('spe = %s(pop_num, dim_num, target, max_evaluations = %s_max_evals, observe_points = %s_observe_points,\
 							   archive_switch = archive_switch, project_name = project_name, info_switch = False,\
 							   experiment_name = experiment_name, epoch = epoch)' % (algorithm, suite, suite))
-				#print os.path.join(spe.archiver.file_path, spe.archiver.file_name)
-				#sys.exit(0)
 				spe.evolveSpecies()
 				
 		print "%s: %d done, %d undone" % (target, done_count, undone_count)
 		total_done_count += done_count
 		total_undone_count += undone_count
-			#print algorithm, target, pop_num, dim_num, epoch
+
 	print "%d done" % total_done_count
 	print "%d undone" % total_undone_count
-	#generate_head_files(os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData'))
-	#generate_stat_files(project_name, experiment_name)
 
 def single_algorithm_plot(package, algorithm, pop_num, dim_num, benchmark_name, max_evaluations, epoch_num, archive_switch):
 	exec('from %s import %s' % (package, algorithm))
@@ -119,14 +101,14 @@ def single_algorithm_plot(package, algorithm, pop_num, dim_num, benchmark_name, 
 	experiment_name = 'single_algorithm_plot'
 
 	for epoch in range(1, epoch_num + 1):
-		if os.path.exists(os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, str(pop_num), str(dim_num), benchmark_name, str(epoch)]) + '.sto')):
+		if os.path.exists(os.path.join(DATA_PATH, project_name, experiment_name, 'rawData', '_'.join([algorithm, str(pop_num), str(dim_num), benchmark_name, str(epoch)]) + '.sto')):
 			continue
 		else:
 			exec('spe = %s(pop_num, dim_num, benchmark_name, max_evaluations = max_evaluations, info_switch = False,\
 						   archive_switch = archive_switch, project_name = project_name, experiment_name = experiment_name,\
 						   epoch = epoch)' % (algorithm))
 			spe.evolveSpecies()
-	generate_head_files(os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData'))
+	generate_head_files(os.path.join(DATA_PATH, project_name, experiment_name, 'rawData'))
 	generate_stat_files(project_name, experiment_name)
 
 

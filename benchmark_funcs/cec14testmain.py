@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np 
 from cec_14_real_parameter import *
-from StochasticOptimization_gamma_test.common import CODE_PATH
+from constant import CODE_PATH
 
 input_data_path 	= os.path.join(CODE_PATH, 'benchmark_funcs', 'CEC_2014_RP_Data')
 

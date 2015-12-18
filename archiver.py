@@ -50,10 +50,3 @@ class Archiver(object):
 			self.file.close()
 		else:
 			return
-'''
-	def nextFile(self, epoch):
-		self.file_name = self.file_name[:self.file_name.rfind('_')+1] + str(epoch) + '.sto'
-
-	def preFile(self, epoch):
-		pass
-'''

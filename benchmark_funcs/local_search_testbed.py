@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np 
 from copy import copy
-from StochasticOptimization_gamma_test.common import CODE_PATH
+from constant import CODE_PATH
 from benchmark import Benchmark
 
 

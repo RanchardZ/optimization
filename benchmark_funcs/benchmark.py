@@ -1,8 +1,7 @@
 import os, sys
 import numpy as np 
 from copy import copy
-#from common import CODE_PATH
-CODE_PATH = '/home/hxx/Desktop/hehe/zhCode/StochasticOptimization_gamma_test/'
+from constant import CODE_PATH
 class Benchmark(object):
 	"""Defines a global optimization benchmark problem
 	"""

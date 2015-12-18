@@ -4,9 +4,7 @@ from copy import copy
 from archiver import Archiver
 from util import printMessage, makeDirs
 from plot_toolbox import Plot
-
-CODE_PATH = '/home/lgp105b/zhenghe/zhCode/StochasticOptimization_gamma_test/'
-ROOT_PATH = '/home/lgp105b/zhenghe/experimentData'
+from constant import CODE_PATH, DATA_PATH
 
 def generate_head_files(fileDir):
 	fileSet			= os.listdir(fileDir)
@@ -31,7 +29,7 @@ def generate_head_files(fileDir):
 		f.close()
 
 def get_head_files(project_name, experiment_name):
-	return os.listdir(os.path.join(ROOT_PATH, project_name, experiment_name, 'headFiles'))
+	return os.listdir(os.path.join(DATA_PATH, project_name, experiment_name, 'headFiles'))
 
 def read_from_head_file(filePath):
 	f = open(filePath)
@@ -40,18 +38,18 @@ def read_from_head_file(filePath):
 	return data_files
 
 def generate_stat_files(project_name, experiment_name):
-	statDir = os.path.join(ROOT_PATH, project_name, experiment_name)
+	statDir = os.path.join(DATA_PATH, project_name, experiment_name)
 	try:
 		makeDirs(statDir)
 	except:
 		pass
 	headFiles = get_head_files(project_name, experiment_name)
 	for headFile in headFiles:
-		data_files 	= read_from_head_file(os.path.join(ROOT_PATH, project_name, experiment_name, 'headFiles', headFile))
+		data_files 	= read_from_head_file(os.path.join(DATA_PATH, project_name, experiment_name, 'headFiles', headFile))
 		find_stat(data_files, project_name, experiment_name, headFile) 
 
 def find_stat(dataFiles, project_name, experiment_name, headFile, overwrite = 0):
-	statFilePath 		= os.path.join(ROOT_PATH, project_name, experiment_name, 'statFiles', headFile[:headFile.rfind('.')])
+	statFilePath 		= os.path.join(DATA_PATH, project_name, experiment_name, 'statFiles', headFile[:headFile.rfind('.')])
 	makeDirs(statFilePath)
 	avg_over_time_file_path = os.path.join(statFilePath, headFile[:headFile.rfind('.')] + '.stat')
 	if os.path.exists(avg_over_time_file_path) and (not overwrite):
@@ -60,7 +58,7 @@ def find_stat(dataFiles, project_name, experiment_name, headFile, overwrite = 0)
 	aot_iter, aot_eval 	= [], []
 	m_length = 100000000000000000 # large number
 	for dataFile in dataFiles:
-		archiv = Archiver('find_stat', os.path.join(ROOT_PATH, project_name, experiment_name, 'rawData'), dataFile, True)
+		archiv = Archiver('find_stat', os.path.join(DATA_PATH, project_name, experiment_name, 'rawData'), dataFile, True)
 		archiv.openFileToRead()
 		num_iter, num_eval, best_value, g_best_value, diversity = [], [], [], [], []
 		while True:
@@ -77,13 +75,10 @@ def find_stat(dataFiles, project_name, experiment_name, headFile, overwrite = 0)
 		if len(num_iter) < m_length:
 			m_length = len(num_iter)
 		print dataFile, m_length
-		#print len(num_iter), num_eval[-1]
 
 		best_value_arr 		= np.array(best_value)[:m_length]
 		g_best_value_arr	= np.array(g_best_value)[:m_length]
 		diversity_arr 		= np.array(diversity)[:m_length]
-
-		#d_length 	= len(num_eval)
 
 		if len(aot_iter) == 0:
 			aot_iter 	= copy(num_iter)
@@ -95,8 +90,7 @@ def find_stat(dataFiles, project_name, experiment_name, headFile, overwrite = 0)
 			aot_bv 	= np.concatenate((aot_bv[:, :m_length], best_value_arr.reshape(1, m_length)), axis = 0)
 			aot_gbv = np.concatenate((aot_gbv[:, :m_length], g_best_value_arr.reshape(1, m_length)), axis = 0)
 			aot_dvt	= np.concatenate((aot_dvt[:, :m_length], diversity_arr.reshape(1, m_length)), axis = 0) 
-	print aot_bv.shape
-	#print aot_bv.shape 
+
 	abv 		= np.average(aot_bv, axis = 0)
 	stdbv 		= np.std(aot_bv, axis = 0)
 	agbv 		= np.average(aot_gbv, axis = 0) 
@@ -109,8 +103,8 @@ def find_stat(dataFiles, project_name, experiment_name, headFile, overwrite = 0)
 	avg_over_time_file.close()
 
 def read_stat_file(project_name, experiment_name, stat_file_dir):
-	print 'reading from: ' + os.path.join(ROOT_PATH, project_name, experiment_name, 'statFiles', stat_file_dir)
-	statFilePath 	= os.path.join(ROOT_PATH, project_name, experiment_name, 'statFiles', stat_file_dir)
+	print 'reading from: ' + os.path.join(DATA_PATH, project_name, experiment_name, 'statFiles', stat_file_dir)
+	statFilePath 	= os.path.join(DATA_PATH, project_name, experiment_name, 'statFiles', stat_file_dir)
 	statFile 		= open(os.path.join(statFilePath, stat_file_dir+'.stat'), 'r')
 	statData 		= map(str.strip, statFile.readlines())
 	num_iter, num_eval, abv, stdbv, agbv, stdgbv, advt, stddvt = [], [], [], [], [], [], [], []
@@ -129,15 +123,13 @@ def read_stat_file(project_name, experiment_name, stat_file_dir):
 	return num_iter, num_eval, abv, stdbv, agbv, stdgbv, advt, stddvt
 
 def get_last_result(project_name, experiment_name, stat_file_dirs, result_file_name):
-	#result_file = open(os.path.join(ROOT_PATH, project_name, experiment_name, 'statFiles', result_file_name), 'w')
 	result_list = []
 	for stat_file_dir in stat_file_dirs:
 		n_iter, n_eval, abv, stbv, agv, stgv, adt, stdt = read_stat_file(project_name, experiment_name, stat_file_dir)
 		result_list.append(stat_file_dir + ': ' + ' '.join([str(abv[-1]), str(stbv[-1])]) + '\n')
-		#result_file.write(stat_file_dir + ': ' + ' '.join([str(abv[-1]), str(stbv[-1])]) + '\n')
-	#result_file.close()
+		
 	result_list.sort(reverse = True)
-	result_file = open(os.path.join(ROOT_PATH, project_name, experiment_name, 'statFiles', result_file_name), 'w')
+	result_file = open(os.path.join(DATA_PATH, project_name, experiment_name, 'statFiles', result_file_name), 'w')
 	for line in result_list:
 		result_file.write(line)
 	result_file.close()
@@ -162,7 +154,7 @@ class singular_visualize(object):
 		self.adv, self.stdv = np.array(adv), np.array(stdv)
 
 	def show_fitness(self):
-		fitness_plot = Plot(os.path.join(ROOT_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
+		fitness_plot = Plot(os.path.join(DATA_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
 										 [self.n_eval], [self.agv], [self.label], self.stat_file_dir+'_fitness.jpg')
 		fitness_plot.line_plot()
 		fitness_plot.set_xlabel('number of evaluations')
@@ -172,7 +164,7 @@ class singular_visualize(object):
 		fitness_plot.close_plot()
 
 	def show_diversity(self):
-		diversity_plot = Plot(os.path.join(ROOT_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
+		diversity_plot = Plot(os.path.join(DATA_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
 										   [self.n_eval], [self.adv], [self.label], self.stat_file_dir+'_diversity.jpg')
 		diversity_plot.line_plot()
 		diversity_plot.set_xlabel('number of evaluations')
@@ -182,7 +174,7 @@ class singular_visualize(object):
 		diversity_plot.close_plot()
 
 	def show_fitness_diversity(self):
-		fd_plot = Plot(os.path.join(ROOT_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
+		fd_plot = Plot(os.path.join(DATA_PATH, self.project_name, self.experiment_name, 'visualizedData', self.stat_file_dir),\
 										 np.vstack((self.n_eval, self.n_eval)), np.vstack((self.agv, self.adv)), \
 										 [self.label, self.label], figName = self.stat_file_dir+'_fitness_diversity.jpg')
 		fd_plot.line_plot()
@@ -224,7 +216,7 @@ class comparative_visualize(object):
 		else:
 			plot_name = self.result_file_dir + '_%s_fitness.jpg' % self.func_name
 
-		fitness_plot = Plot(os.path.join(ROOT_PATH, self.project_name, self.experiment_name, 'visualizedData', self.result_file_dir),\
+		fitness_plot = Plot(os.path.join(DATA_PATH, self.project_name, self.experiment_name, 'visualizedData', self.result_file_dir),\
 							self.n_eval, self.agv, self.labels, plot_name)
 
 		if semilogy:
@@ -243,7 +235,7 @@ class comparative_visualize(object):
 		else:
 			plot_name = self.result_file_dir + '_%s_diversity.jpg' % self.func_name
 
-		diversity_plot = Plot(os.path.join(ROOT_PATH, self.project_name, self.experiment_name, 'visualizedData', self.result_file_dir),\
+		diversity_plot = Plot(os.path.join(DATA_PATH, self.project_name, self.experiment_name, 'visualizedData', self.result_file_dir),\
 							self.n_eval, self.adv, self.labels, plot_name)
 		diversity_plot.line_plot()
 		diversity_plot.set_xlabel('number of evaluations')

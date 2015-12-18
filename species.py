@@ -9,7 +9,7 @@ from benchmark_funcs.cec_14_real_parameter import *
 from benchmark_funcs.karaboga import *
 from terminator import Terminator
 from archiver import Archiver
-from common import ROOT_PATH
+from constant import DATA_PATH
 from util import printMessage
 
 class Species(object):
@@ -17,7 +17,7 @@ class Species(object):
 	def __init__(self, pop_num, dim_num, target, species_name, **kwargs):
 		self.pop_num, self.dim_num 		= pop_num, dim_num
 		self.target, self.species_name 	= target, species_name		
-		self._kwargs = kwargs
+		self._kwargs 					= kwargs
 		
 		self.init_terminator(self._kwargs)
 		self.init_target()
@@ -26,19 +26,10 @@ class Species(object):
 		self.init_info(self._kwargs)
 		self.init_params()
 
-	def evolveOneIter(self):
-		if not self.terminator.should_terminate():
-			eval_inc 		= self.oneIteration()
-			self.terminator.add_stat(iter_inc = 1, eval_inc = eval_inc)
-			self.terminator.update_diversity(get_diversity(self.population))
-			self.observe(eval_inc)
-			self.archive()
-		self.clean()
-
 	def evolveSpecies(self):
 
 		while not self.terminator.should_terminate():
-			eval_inc 		= self.oneIteration()
+			eval_inc = self.oneIteration()
 			self.terminator.add_stat(iter_inc = 1, eval_inc = eval_inc)
 			self.terminator.update_diversity(get_diversity(self.population))
 			self.observe(eval_inc)
@@ -46,7 +37,7 @@ class Species(object):
 		self.clean()
 
 	def oneIteration(self):
-		"""This function should be overridden to perform one iteration and return the number of evaluations 
+		"""This function should be rewritten to perform one iteration and return the number of evaluations 
 		"""
 		raise NotImplementedError
 
@@ -105,15 +96,13 @@ class Species(object):
 									 source 			= self.species_name)
 
 	def init_target(self):
-		#exec("self.optimization_target = %s(kwargs.get('seed'))" % (target))
 		exec("self.optimization_target = %s(%d)" % (self.target, self.dim_num))
-		#self.optimization_target 	= target
 
 	def init_archiver(self, kwargs):
 		self.epoch  			= kwargs.setdefault('epoch', 1)
 		archive_switch 			= kwargs.setdefault('archive_switch', False)
 		self.archiver 			= Archiver(self.species_name,\
-								 os.path.join(ROOT_PATH, kwargs.setdefault('project_name', 'test'), kwargs.setdefault('experiment_name', 'testSpecies'), 'rawData'),\
+								 os.path.join(DATA_PATH, kwargs.setdefault('project_name', 'test'), kwargs.setdefault('experiment_name', 'testSpecies'), 'rawData'),\
 								 '_'.join([self.species_name, str(self.pop_num), str(self.dim_num), self.target, str(int(self.terminator.max_eval)), str(self.epoch)]) + '.sto', archive_switch)
 		self.archiver.openFileToWrite()
 
@@ -133,6 +122,7 @@ class Species(object):
 		self.cur_point 			= self.observe_points.next()
 
 	def init_params(self):
+		# rewrite it with species-specific parameters
 		pass
 
 

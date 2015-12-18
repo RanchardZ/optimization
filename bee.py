@@ -1,8 +1,8 @@
-import random, sys
-import numpy as np 
-from copy import copy 
 from species import Species 
 from util import printMessage, rouletteWheelSelection
+from copy import copy 
+import random, sys
+import numpy as np 
 
 class ABC(Species):
 
@@ -18,7 +18,7 @@ class ABC(Species):
 		else:
 			eval_inc += self.sendOnlookerBees()
 		eval_inc += self.sendScoutBees()
-		self.findBest()
+		self.find_best()
 		return eval_inc
 
 	def sendEmployedBees(self):
@@ -95,7 +95,7 @@ class SLG(Species):
 	def oneIteration(self):
 		eval_inc = 0
 		eval_inc += self.move()
-		self.findBest()
+		self.find_best()
 		return eval_inc
 
 	def move(self):

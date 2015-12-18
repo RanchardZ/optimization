@@ -2,7 +2,7 @@ import os, sys
 import numpy as np 
 from copy import copy
 from benchmark import Benchmark, check_shape
-from StochasticOptimization_gamma_test.common import CODE_PATH
+from constant import CODE_PATH
 
 class Sphere(Benchmark):
 	def __init__(self, dim_num = 30, bound = [-100., 100.]):
@@ -31,7 +31,7 @@ class Rastrigin(Benchmark):
 
 	def evaluate(self, population):
 		population = check_shape(population)
-		return self.A * self.dimensions + np.sum(population**2 - self.A*np.cos(2*np.pi*population), axis = 1)
+		return self.A * self.dim_num + np.sum(population**2 - self.A*np.cos(2*np.pi*population), axis = 1)
 
 class Griewank(Benchmark):
 	def __init__(self, dim_num = 50, bound = [-600., 600.]):
@@ -41,7 +41,7 @@ class Griewank(Benchmark):
 	def evaluate(self, population):
 		population = check_shape(population)
 		return 1. / 4000. * np.sum(population * population, axis = 1) -\
-							np.multiply.reduce(np.cos(population / np.sqrt((np.arange(self.dimensions) + 1.))), axis = 1) + 1.
+							np.multiply.reduce(np.cos(population / np.sqrt((np.arange(self.dim_num) + 1.))), axis = 1) + 1.
 
 class Rosenbrock(Benchmark):
 	def __init__(self, dim_num = 50, bound = [-50., 50.]):
