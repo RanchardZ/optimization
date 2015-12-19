@@ -1,7 +1,10 @@
 # optimization
 This package is used for numeric optimization of single objective problem
+
 Author:       Ranchard Zheng
+
 Email:        ranchardzheng@ruc.edu.cn
+
 Affiliation:  MMC Lab of Renmin University of China
 
 After cloning this package, you need to modify the CODE_PATH and DATA_PATH in constant.py
